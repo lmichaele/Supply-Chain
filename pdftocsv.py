@@ -1,59 +1,49 @@
 #! python3
-#PDF TO CSV PYTHON
-#1)pulls a string of text of the whole pdf
-#2)pulls a list of values from the text, #being line,part
-#3)
-#4)
+#PDF TO CSV
 
-import os
-import PyPDF2
-import csv
-import re
-
-#need to turn all the pdfs into one, then turn that into a string 
-
-os.chdir('/Users/lmichaele/Documents/SVR/') 
-os.getcwd()
+import os, PyPDF2, csv, re, shutil, send2trash
 
 pdfFiles = []
 
-files = [f for f in os.listdir('.') if os.path.isfile(f)] #now you have a list of files.
-for f in files:
-    if f.endswith('.pdf'):
-        pdfFiles.append(f)
+os.chdir('G:\\Supply Chain\\Warehouse\\Stocktake\\Stocktake Variance Reports')
+
+for filename in os.listdir('.'):
+    if filename.endswith('.pdf'):
+        pdfFiles.append(filename)
         
 pdfFiles.sort(key = str.lower)
+
+pdfWriter = PyPDF2.PdfFileWriter()
 
 Allpdf = []
 
 for filename in pdfFiles:
-    pdfFileObj = open(f, 'rb')
+    pdfFileObj = open(filename, 'rb')
     pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-    Allpdf.append(str(pdfReader))
-    
-#       pdfFileObj = open(f, 'rb') #fixprint me
-# pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
 
-pdfWriter = PyPDF2.PdfFileWriter()
+    for pageNum in range(0, pdfReader.numPages):
+        pageObj = pdfReader.getPage(pageNum)
+        pdfWriter.addPage(pageObj)
 
-for pageNum in range(0, len.Allpdf):
-    pageObj = pdfReader.getPage(pageNum) #'PageObject' object has no attribute 'seek'
-    append.pdfWriter(pageObj)
+pdfOutput = open('master.pdf', 'wb')
+pdfWriter.write(pdfOutput)
+pdfOutput.close()
 
-pdfReader = PyPDF2.PdfFileReader(pageObj)
+pdfFileObj2 = open('master.pdf', 'rb')
+pdfReader = PyPDF2.PdfFileReader(pdfFileObj2)
 
-LastPage = (pdfReader.numPages)-1 #there is a better way to do this but it works...
+LastPage = (pdfReader.numPages)-1 
 CurrentPage = 0
 AllPdfText = []
 while CurrentPage <= LastPage :
     pageObj = pdfReader.getPage(CurrentPage)
     PdfText = pageObj.extractText()
-    AllPdfText.append(str(PdfText)) #how to change global things locally. 
+    AllPdfText.append(str(PdfText)) 
     CurrentPage = CurrentPage + 1
 
 AllPagesStr = ''.join(AllPdfText)
 
-PhysInvReg =  re.compile(r'12000\d\d\d\d')
+PhysInvReg =  re.compile(r'1200\d\d\d\d\d')
 PhysInvNo = PhysInvReg.findall(AllPagesStr)
 
 LineReg = re.compile(r'0000[1-9][0-1][0-9]')
@@ -96,4 +86,21 @@ while i!=length_list :
     i=i+1
     outputWriter.writerow(data)
 
+pdfFileObj2.close()
 csvoutput.close()
+
+#send2trash.send2trash('G:\\Supply Chain\\Warehouse\\Stocktake\\Stocktake Variance Reports\\master.pdf')# Delete the master  pdf
+
+#TODO move all pdfs into archives
+
+source = 'G:\\Supply Chain\\Warehouse\\Stocktake\\Stocktake Variance Reports'
+dest1 = 'G:\\Supply Chain\\Warehouse\\Stocktake\\Variance Archives'
+
+files = os.listdir(source)
+
+for f in files: 
+    if filename.endswith('.pdf'):
+        shutil.move(f, dest1)
+
+
+
