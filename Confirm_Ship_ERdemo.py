@@ -119,8 +119,11 @@ for i in AUD:
 SHIPLIST = []
 for i in invoices:
     SHIPLIST.append(SHIP)
+    
 
-EDR = openpyxl.load_workbook('G:\\Supply Chain\\Data\\SHIPMENTS\\Electronic Register - SGS - Copy.xlsx')
+ERpath = 'G:\\Supply Chain\\Data\\SHIPMENTS\\Electronic Register - SGS - Copy.xlsx'
+
+EDR = openpyxl.load_workbook('
 sheet = EDR.get_sheet_by_name('Register')
 
 nextrow = int(sheet.max_row)+1
