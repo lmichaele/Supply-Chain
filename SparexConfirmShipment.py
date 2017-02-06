@@ -1,33 +1,28 @@
 #!/usr/bin/env python3
-import openpyxl, csv, os, time, glob, shutil, datetime
+import openpyxl, csv, os, time, glob, shutil, datetime 
 from forex_python.converter import CurrencyRates
 c = CurrencyRates()
 
 print ('Before starting, make sure all csv invoices are saved in Supply Chain > CSV > New Shipment.')
 
-EDR = openpyxl.load_workbook('G:\\Supply Chain\\Data\\SHIPMENTS\\Electronic Register - SGS.xlsx')
+EDR = openpyxl.load_workbook('G:\\Supply Chain\\Data\\SHIPMENTS\\Electronic Register - SGS.xlsx', read_only=True)
 
 sheet = EDR.get_sheet_by_name('Register')
-
-#sheet.max_row
 
 lship = sheet.cell(row=(sheet.max_row), column=2).value
 
 while True:
     try:
-        SHIP = int(input("Please enter a shipment number. The last used number was " + str(lship)+".")) 
+        SHIP = int(input("Please choose shipment a shipment number. The last used number was " + str(lship)+".")) 
     except ValueError:
         print('Try again - make sure you have chosen a four digit number, that is bigger than ' + str(lship) +'.')
     else:
-        break #TO DO - Make more rules, like correct number chosen etc 
-print("Thanks. Creating folders and doing stuff...")
-
-#add number to ER
-
+        break  
+print("Creating folders for SHIP"+(SHIP)"...")
 
 directory = "G:\\Supply Chain\\Ship Files\\SHIP" + str(SHIP) + "\\"
 
-if not os.path.exists(directory): #creates new ship folder
+if not os.path.exists(directory): #Creates Shipment folders
     os.makedirs(directory)
 
 print("G:\\Supply Chain\\Ship Files\\SHIP" + str(SHIP) + "\\ has been created to store all documents relating to shipment")
@@ -53,7 +48,7 @@ time.sleep(2)
 #for d in delfiles:
  #   os.remove(d)
 
-print("Master invoice created. Now creating ConfirmPOLines...")
+print("Master invoice created. Now creating ConfirmPOLines...") #Start of ConfirmPOLines process
 
 os.chdir(directory)
 
@@ -65,7 +60,6 @@ r = 0
 exampleFile = open(file)
 exampleReader = csv.reader(exampleFile)
 exampleData = list(exampleReader)
-invoice = "invoice"
 for row in exampleData:
     if exampleData[r][0] == 'INH':
         example = 0
@@ -76,9 +70,9 @@ for row in exampleData:
         part = exampleData[r][1]
         qty = exampleData[r][3]
         try:
-            price = round(float(exampleData[r][6]) // float(exampleData[r][3]),2)
+            price = round(float(exampleData[r][6]) / float(exampleData[r][3]),2)
         except ZeroDivisionError:
-            price = 0
+            price = 0.01
         po = exampleData[r][7]
         date = datetime.datetime.now().strftime("%Y%m%d")
         drow = (SHIPinv,part,qty,price,po,date)
@@ -96,7 +90,7 @@ outputfile.close()
 
 time.sleep(5)
 
-print("ConfirmPOLines created in Supply Chain > CSV > Shipment Uploads > Ready to Load")
+print("ConfirmPOLines created in Supply Chain > CSV > Shipment Uploads > Ready to Load") #End of ConfirmPOLines
 
 time.sleep(3)
 
@@ -104,7 +98,7 @@ os.chdir(directory)
 
 while True:
     try:
-        DMT = str(input('Is this shipment Airfreight or Seafreight? (Enter A or S)'))
+        DMT = str(input('Is this shipment Airfreight or Seafreight? (Enter A or S)')) #start of files for freight forwarders
     except:
         print("Not a valid option. Try again")
     if DMT == 'A':
@@ -148,11 +142,23 @@ while True:
         break
         
     elif DMT == 'S':
-        print('Seafreight confirmed.') #TODO create invoices for JAS
+
+        print('Seafreight confirmed. Creating file for JAS forwarding...') #TODO create invoices for JAS
+        
+        sf_files = glob.glob("*.csv")
+        SFsource = ("G:\\Supply Chain\\CSV\Shipment Uploads\\New Shipment\\")
+        SFdest = ("G:\\Supply Chain\\CSV\\Files for Freight Forwarders\\")
+        for f in sf_files:
+            shutil.copy(f,SFdest)
+        print('Seafreigth invoices created in Supply Chain > CSV > Files for Freight Forwarders') 
+        break
+        
     else:
         print("Not a valid option. Please try again")
+        break
 
-print("Updating the Electronic Register...")
+#file.close()
+print("Updating the Electronic Register...") #end of files for freight forwarders
 
 directory = "G:\\Supply Chain\\Ship Files\\SHIP" + str(SHIP) + "\\"
 
@@ -258,7 +264,7 @@ for row in data:
         Supplier.append(735)
     r=r+1
 
-GBP = c.get_rate('GBP','AUD')
+GBP = c.get_rate('AUD','GBP')
 AUD = []
 for i in FCV:
    AUD.append(float(i) * GBP)
