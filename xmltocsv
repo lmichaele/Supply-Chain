@@ -1,0 +1,22 @@
+#! /usr/bin/python
+
+from xml.dom.minidom import parse
+import xml.dom.minidom
+import csv
+
+def writeToCSV(myLibrary):
+    with open('output.csv', 'wb') as csvfile:
+        writer = csv.writer(csvfile, delimiter=',',quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        writer.writerow(['title', 'author', 'author'])
+        books = myLibrary.getElementsByTagName("book")
+        for book in books:
+            titleValue = book.getElementsByTagName("title")[0].childNodes[0].data
+            authors = [] # get all the authors in a vector
+            for author in book.getElementsByTagName("author"):
+                authors.append(author.childNodes[0].data)
+            writer.writerow([titleValue] + authors) # write to csv
+
+doc = parse('library.xml')
+myLibrary = doc.getElementsByTagName("library")[0]
+# Print each book's title
+writeToCSV(myLibrary)
