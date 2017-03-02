@@ -1,22 +1,52 @@
 #! /usr/bin/python
 
-from xml.dom.minidom import parse
-import xml.dom.minidom
-import csv
+import xml.etree.ElementTree as ET
+import tkinter as tk
+from tkinter import filedialog
+import re, csv
+from datetime import timedelta, datetime
+ 
+tkroot = tk.Tk()
+tkroot.withdraw()
+file = filedialog.askopenfilename()
+ 
+tree = ET.parse(file)
+root = tree.getroot()
+xmlstr = ET.tostring(root, encoding='utf8', method='xml')
+ 
+ln = re.findall(r'<LineNumber>(\d*)</LineNumber>', (str(xmlstr)))
+ 
+inv = re.findall(r'<InvoiceNumber>(........)', (str(xmlstr)))
+ 
+pnol = re.findall(r'<PartNumberOrdered>([^<]+)</PartNumberOrdered>', (str(xmlstr)))
+ 
+pnsl = re.findall(r'<PartNumberSupplied>([^<]+)</PartNumberSupplied>', (str(xmlstr)))
 
-def writeToCSV(myLibrary):
-    with open('output.csv', 'wb') as csvfile:
-        writer = csv.writer(csvfile, delimiter=',',quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        writer.writerow(['title', 'author', 'author'])
-        books = myLibrary.getElementsByTagName("book")
-        for book in books:
-            titleValue = book.getElementsByTagName("title")[0].childNodes[0].data
-            authors = [] # get all the authors in a vector
-            for author in book.getElementsByTagName("author"):
-                authors.append(author.childNodes[0].data)
-            writer.writerow([titleValue] + authors) # write to csv
+qtys = re.findall(r'<QuantitySent>(\d*)</QuantitySent>', (str(xmlstr)))
 
-doc = parse('library.xml')
-myLibrary = doc.getElementsByTagName("library")[0]
-# Print each book's title
-writeToCSV(myLibrary)
+price = re.findall(r'<UnitPrice>([^<]+)</UnitPrice>', (str(xmlstr)))
+
+orderref = re.findall(r'<CustomerOrderRef>(\d*)</CustomerOrderRef>', (str(xmlstr)))
+
+partdiff = [i for i, j in zip(pnol, pnsl) if i != j]
+if not partdiff:
+    print("All parts match original order.")
+else: print("Parts different from original order:"+(str(partdiff)))
+
+csvRows = []
+n = 0
+while n < len(ln):
+    partsup = pnsl[n]
+    qty = qtys[n]
+    prc = price[n]
+    po = orderref[n]
+    date = (datetime.now() + timedelta(days=7)).strftime("%Y%m%d")
+    row = (inv,partsup,qty,prc,date)
+    csvRows.append(row)
+    n = n+1
+
+outputfile = open('test.csv', 'w', newline='')
+outputwriter = csv.writer(outputfile)
+for row in csvRows:
+    outputwriter.writerow(row)
+outputfile.close()
