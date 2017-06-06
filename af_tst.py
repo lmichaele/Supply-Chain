@@ -34,7 +34,6 @@ por = Porg.findall(data)
 
 csvRows = []
 n=0
-x=-1
 while n < len(Partr):
     Part = (df.A[n].replace(" ", ""))
     Qty = qtyr[n]
@@ -47,10 +46,28 @@ while n < len(Partr):
 
 csvRows.sort()
 
+newrows = []
+n=1
+k=2
+newrows.append(csvRows[0])
+for row in csvRows:
+    try:
+        if csvRows[n][1]+csvRows[n][4] == csvRows[k][1]+csvRows[k][4]:
+            newrows.insert(n,(csvRows[n][0],csvRows[n][1],csvRows[n][2]+csvRows[k][2],csvRows[n][3],csvRows[n][4],csvRows[n][5]))
+        else: newrows.append(csvRows[k])
+        n=n+1
+        k=k+1
+    except IndexError:
+        continue 
+print(newrows)
+
 outputfile = open('ConfirmPOLines.csv', 'a', newline='')
 outputwriter = csv.writer(outputfile, dialect='excel')
-for row in csvRows:
-    outputwriter.writerow(row)
+n=0
+while n < len(newrows):
+    outputwriter.writerow(newrows[n])
+    n=n+1
 outputfile.close()
 
 #shutil.move(file, "C:\\Users\\edwluk1\\Documents\\PDF\\Archive\\")
+
