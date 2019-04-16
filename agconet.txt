@@ -1,0 +1,11 @@
+https://net.agcocorp.com/agconet/_dotNet35/login/login.asp
+
+Agconet UK
+
+logon: odwpxc
+
+
+https://agconet.agco.com.au/agconetStaffprod11/AGCOSystemlogin.cfm
+
+Agconet local
+
