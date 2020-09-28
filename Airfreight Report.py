@@ -16,7 +16,6 @@ tkroot.withdraw()
 file1 = filedialog.askopenfilename(title='Choose QV download')
 afr = pd.read_excel(file1)
 safr = pd.DataFrame() #service af df
-
 vafr = pd.DataFrame() #VOR dataframe
 
 safr = afr[['Item Number', 'Item Description', 'Demand', 'Current WAC','PO Qty 45']] #SER
@@ -41,7 +40,7 @@ spp = ['4392734M12',
        '009K155961100', '007H093960100', 'Z741200011013', '0070174200000', 'ACP0503890', 'ACP0503660', 'Z731200980020',
        'ACP0503720', 'ACP0503640', 'ACP0503650', 'ACP0503670', 'ACP0503690', 'ACP0503710', 'ACP0503740', 'ACP0503760',
        'ACP0503770', '0974259330600', '007F251891500', '0070036200000', '4315071M1', '4380811M17',
-       '096K155800000', '7250104209', '7500640007', '3712626M1', '3931899M2', '4276429M91', '005A027800100', '093K120920100']
+       '096K155800000', '7250104209', '7500640007', '3712626M1', '3931899M2', '4276429M91', '005A027800100', '093K120920100', '0974236420500']
 
 
 # In[5]:
@@ -172,4 +171,6 @@ safr.to_excel(writer,'Service', index=False)
 vafr.to_excel(writer,'VOR', index=False)
 
 writer.save()
+
+print("All done")
 

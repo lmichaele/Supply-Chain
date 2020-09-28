@@ -42,7 +42,7 @@ for message in inbox.Items:
   if message.UnRead == True:         
       try:
           Invoice = re.search(r"AGCO PARTS INVOICE (A\d{7}) 81411-002", message.Subject).group(1)
-         print(Invoice)
+          print(Invoice)
           for attachment in message.Attachments:
               invoice_xml = '{}.xml'.format(Invoice)
               attachment.SaveAsFile(os.path.join(file_home_path, invoice_xml))
